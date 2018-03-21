@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package org.wso2.ballerina.connectors.oauth2;
+package oauth2.gmail;
 
 import ballerina.net.http;
 

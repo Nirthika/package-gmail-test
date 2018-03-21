@@ -14,21 +14,31 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package wso2.gmail;
+package src.gmail;
 
-transformer <json jsonMessage, Message message> messageTrans() {
-    message.recipient = jsonMessage.to.toString();
-    message.subject = jsonMessage.subject.toString();
-    message.body = jsonMessage.messageBody.toString();
-    message.options = jsonMessage.options != null?<Options, optionsTrans()>jsonMessage.options:{};
+transformer <json jsonUserProfile, UserProfile userProfile> userProfileTrans() {
+    userProfile.emailAddress = jsonUserProfile.emailAddress.toString();
+    userProfile.messagesTotal, _ = <int>jsonUserProfile.messagesTotal.toString();
+    userProfile.threadsTotal, _ = <int>jsonUserProfile.threadsTotal.toString();
+    userProfile.historyId = jsonUserProfile.historyId.toString();
 }
 
 transformer <json jsonMessage, Options options> optionsTrans() {
-    options.contentType = jsonMessage.contentType.toString();
     options.htmlBody = jsonMessage.htmlBody.toString();
     options.from = jsonMessage.from.toString();
     options.cc = jsonMessage.cc.toString();
     options.bcc = jsonMessage.bcc.toString();
+    options.xmlFilePath = jsonMessage.xmlFilePath.toString();
+    options.xmlFileName = jsonMessage.xmlFileName.toString();
+    options.imageFilePath = jsonMessage.imageFilePath.toString();
+    options.imageFileName = jsonMessage.imageFileName.toString();
+    options.pdfFilePath = jsonMessage.pdfFilePath.toString();
+    options.pdfFileName = jsonMessage.pdfFileName.toString();
+}
+
+transformer <json jsonDraft, Draft draft> draftTrans() {
+    draft.id = jsonDraft.id.toString();
+    draft.message = jsonDraft.message != null?<Message, messageTrans()>jsonDraft.message:{};
 }
 
 transformer <json jsonHeader, Header header> headerTrans() {
@@ -59,24 +69,19 @@ transformer <json jsonMessagePayload, MessagePayload messagePayload> messagePayl
     messagePayload.parts = jsonMessagePayload.parts != null?getParts(jsonMessagePayload.parts):[];
 }
 
-transformer <json jsonGmailAPI, GmailAPI gmailAPI> gmailAPITrans() {
-    gmailAPI.id = jsonGmailAPI.id.toString();
-    gmailAPI.threadId = jsonGmailAPI.threadId.toString();
-    gmailAPI.labelIds = jsonGmailAPI.labelIds != null?getLabelIds(jsonGmailAPI.labelIds):[];
-    gmailAPI.snippet = jsonGmailAPI.snippet != null?jsonGmailAPI.snippet.toString():null;
-    gmailAPI.historyId = jsonGmailAPI.historyId != null?jsonGmailAPI.historyId.toString():null;
-    gmailAPI.internalDate = jsonGmailAPI.internalDate != null?jsonGmailAPI.internalDate.toString():null;
-    gmailAPI.payload = jsonGmailAPI.payload != null?<MessagePayload, messagePayloadTrans()>jsonGmailAPI.payload:{};
-    gmailAPI.sizeEstimate = jsonGmailAPI.sizeEstimate != null?<int, convertToInt()>jsonGmailAPI.sizeEstimate:0;
-}
-
-transformer <json jsonDraft, Draft draft> draftTrans() {
-    draft.id = jsonDraft.id.toString();
-    draft.message = jsonDraft.message != null?<GmailAPI, gmailAPITrans()>jsonDraft.message:{};
+transformer <json jsonMessage, Message message> messageTrans() {
+    message.id = jsonMessage.id.toString();
+    message.threadId = jsonMessage.threadId.toString();
+    message.labelIds = jsonMessage.labelIds != null?getLabelIds(jsonMessage.labelIds):[];
+    message.snippet = jsonMessage.snippet != null?jsonMessage.snippet.toString():null;
+    message.historyId = jsonMessage.historyId != null?jsonMessage.historyId.toString():null;
+    message.internalDate = jsonMessage.internalDate != null?jsonMessage.internalDate.toString():null;
+    message.payload = jsonMessage.payload != null?<MessagePayload, messagePayloadTrans()>jsonMessage.payload:{};
+    message.sizeEstimate = jsonMessage.sizeEstimate != null?<int, convertToInt()>jsonMessage.sizeEstimate:0;
 }
 
 transformer <json jsonDrafts, Drafts drafts> draftsTrans() {
-    drafts.drafts = getDrafts(jsonDrafts.drafts);
+    drafts.drafts = getDrafts(jsonDrafts.drafts);// Todo: use map (low)
     drafts.resultSizeEstimate = jsonDrafts.resultSizeEstimate != null?<int, convertToInt()>jsonDrafts.resultSizeEstimate:0;
     drafts.nextPageToken = jsonDrafts.nextPageToken != null?jsonDrafts.nextPageToken.toString():null;
 }
@@ -88,9 +93,9 @@ transformer <json jsonDraftsListFilter, DraftsListFilter draftsListFilter> draft
     draftsListFilter.q = jsonDraftsListFilter.q != null?jsonDraftsListFilter.q.toString():null;
 }
 
-transformer <json jsonStatusCode, StatusCode statusCode> statusCodeTrans() {
-    statusCode.statusCode, _ = <int>jsonStatusCode.statusCode.toString();
-    statusCode.reasonPhrase = jsonStatusCode.reasonPhrase.toString();
+transformer <json jsonGmailError, GmailError gmailError> gmailErrorTrans() {
+    gmailError.statusCode, _ = <int>jsonGmailError.statusCode.toString();
+    gmailError.errorMessage = jsonGmailError.reasonPhrase.toString();
 }
 
 transformer <json jsonVal, int intVal> convertToInt() {
